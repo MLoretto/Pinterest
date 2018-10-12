@@ -1,9 +1,11 @@
-<div class="card-columns" >
-  <div *ngFor="let url of Urls; let i = index" >
+<div class="card-columns" 
+    infiniteScroll
+   (scrolled)="onScroll()" >
+  <div *ngFor="let item of imagenes; let i = index" >
     <div class="card">
-      <img class="card-img-top" src="{{url}}" alt="Card image cap">
+      <img class="card-img-top" src="{{item.url}}" alt="Card image cap">
       <div class="card-body">
-        <h5 class="card-title">funny cat GIF</h5>
+        <h5 class="card-title">{{item.titulo}}</h5>
       </div>
     </div>
   </div>
