@@ -6,18 +6,9 @@ import { map, catchError, tap } from 'rxjs/operators';
 const endpoint = 'http://api.giphy.com/v1/gifs/search';
 const keys = '&api_key=29Chm7LzQDppg2KgFP96iZfc42XnYR0M';
 const httpOptions = {
-  /*headers : {
-    // 'Authorization': 'Basic ' + btoa(username + ":" + password),
-   'Access-Control-Allow-Origin': true,
-   'Content-Type': 'application/json; charset=utf-8',
-   "X-Requested-With": "XMLHttpRequest"
-     }
-*/
-
   headers: new HttpHeaders({
     'Content-Type':  'application/json; charset=utf-8' //'application/json'
   })
-
 }
 
 @Injectable({
@@ -29,29 +20,49 @@ export class RestService {
   constructor(private http: HttpClient) {
     console.log("constrido");
   };
-  
+
+  public query : string = '';
+  public total : number = 0;
+  public pag   : number = 1;
+  public regPag: number = 25;
+  public iniReg: number = 0;
+  public offset: number = 0;
+
   private extractData(res: Response) {
     try
     {
-      console.log("pos aqui...");
       let body = res;
-      console.log(body);
       return body || { };
-  
-
     }
     catch(ex){
-      console.log(ex);
       return null;
     }
-
   }
 
-  getProducts(): Observable<any> {
-    console.log('por aqui!!!');
-    return this.http.get(endpoint + '?q=cat' + keys ).pipe(
+  getGif(query:string): Observable<any> {
+
+    this.query = query;
+    this.pag = 1;
+    this.offset = 0;
+    return this.http.get(endpoint + '?q=' + this.query + '&limit=' + this.regPag + '&offset=' + this.offset + keys ).pipe(
       map(this.extractData));
   }
+
+  getNext(): Observable<any> {
+    this.pag ++;
+    this.offset = this.pag * this.regPag;
+    console.log(this.offset);
+    return this.http.get(endpoint  + '?q=' + this.query + '&limit=' + this.regPag + '&offset=' + this.offset + keys ).pipe(
+      map(this.extractData));
+  }
+
+  getPrev(): Observable<any> {
+    this.offset = this.pag * this.regPag;
+    return this.http.get(endpoint + '?q=cat' + '&limit=' + this.regPag + '&offset=' + this.offset + keys ).pipe(
+      map(this.extractData));
+  }
+
+
   /*
   getProduct(id): Observable<any> {
     return this.http.get(endpoint + 'products/' + id).pipe(

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef } from '@angular/core';
 import { RestService } from '../rest.service';
 import { ImagenPin } from '../models/imagen-pin';
 
@@ -8,57 +8,61 @@ import { ImagenPin } from '../models/imagen-pin';
   styleUrls: ['./detalle.component.css']
 })
 
+
 export class DetalleComponent implements OnInit {
 
   contenedor:any = [];
   imagenes:ImagenPin[] = [];
 
-  Urls : string[] = [/*
-    "https://media3.giphy.com/media/JIX9t2j0ZTN9S/200w.gif",
-    "https://media3.giphy.com/media/G3773sSDJHHy0/200w.gif",
-    "https://media2.giphy.com/media/gm3Z05VsyZsFG/200w.gif",
-    "https://media3.giphy.com/media/13CoXDiaCcCoyk/200w.gif",
-    "https://media3.giphy.com/media/vhsNmFjuN4WDS/200w.gif",
-    "https://media3.giphy.com/media/3oEduVGyuRGuZXaqys/200w.gif",
-    "https://media1.giphy.com/media/tBxyh2hbwMiqc/200w.gif",
-    "https://media3.giphy.com/media/11fucLQCTOdvBS/200w.gif",
-    "https://media0.giphy.com/media/XNdoIMwndQfqE/200w.gif",
-    "https://media3.giphy.com/media/26FPCXdkvDbKBbgOI/200w.gif",
-    "https://media0.giphy.com/media/3oEduQAsYcJKQH2XsI/200w.gif",
-    "https://media0.giphy.com/media/CqVNwrLt9KEDK/200w.gif",
-    "https://media2.giphy.com/media/WXB88TeARFVvi/200w.gif",
-    "https://media2.giphy.com/media/3oKIPdNDy4rwsbeiyY/200w.gif",
-    "https://media1.giphy.com/media/jTnGaiuxvvDNK/200w.gif",
-    "https://media2.giphy.com/media/FG6EQNhs3s7ug/200w.gif",
-    "https://media0.giphy.com/media/6bAZXey5wNzBC/200w.gif",
-    "https://media1.giphy.com/media/12HZukMBlutpoQ/200w.gif"
-  */]; 
+  state:boolean = true;
+  Urls : string[] = []; 
 
-  constructor(public rest:RestService) {
+  constructor(public rest:RestService, public el: ElementRef) {
     console.log("Empesemos.");
+  }
+
+  @HostListener('window:scroll', ['$event'])
+  checkScroll() {
+    const componentPosition = this.el.nativeElement.offsetTop
+    const scrollPosition = window.pageYOffset
+    let scrollDiferencia = document.body.scrollHeight - scrollPosition;
+
+    if (scrollDiferencia <= 800 && this.state) {
+      this.state = false;
+      console.log("A cargar...!!!" + this.rest.pag);
+      this.getNext();
+    } else {
+      //console.log("Para donde vas!!!");
+    }
+
   }
 
   ngOnInit() {
     console.log("iniciando");
-    this.getProducts('cat');
+    this.getBusqueda('cat');
   }
 
-  onScroll () {
-    console.log("Scroling");
-    //this.loading = true;
-    setTimeout(() => {
-      //this.fetchTodosPaginated();
-      //this.loading = false;
-    }, 1500);
-  }
-
-
-
-  getProducts(query: string) {
-    console.log("Entramos aqui...");
+  getBusqueda(query: string) {
     this.contenedor = [];
-    this.rest.getProducts().subscribe((data: {}) => {
+    this.rest.getGif(query).subscribe((data: {}) => {
+      this.contenedor = data;
+      this.imagenes = [];
       console.log(data);
+
+      this.contenedor.data.forEach(item => {
+        let imagen = new ImagenPin();
+        imagen.titulo = item.title;
+        imagen.url = item.images.fixed_width.url;
+
+        this.imagenes.push(imagen);
+      });
+    });
+    
+  }
+
+  getNext(){
+    this.contenedor = [];
+    this.rest.getNext().subscribe((data: {}) => {
       this.contenedor = data;
       this.contenedor.data.forEach(item => {
         let imagen = new ImagenPin();
@@ -67,7 +71,7 @@ export class DetalleComponent implements OnInit {
 
         this.imagenes.push(imagen);
       });
-      console.log(this.imagenes);
+      this.state = true;
     });
     
   }
