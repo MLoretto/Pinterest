@@ -31,7 +31,11 @@ export class DetalleComponent implements OnInit {
     const scrollPosition = window.pageYOffset
     let scrollDiferencia = document.body.scrollHeight - scrollPosition;
 
-    if (scrollDiferencia <= 800 && this.state) {
+    console.log(componentPosition);
+    console.log(scrollPosition);
+    console.log(scrollDiferencia);
+
+    if (scrollDiferencia <= 900 && this.state) {
       this.state = false;
       console.log("A cargar...!!!" + this.rest.pag);
       this.getNext();
