@@ -1,6 +1,8 @@
-import { Component, OnInit, HostListener, ElementRef } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef, Input } from '@angular/core';
 import { RestService } from '../rest.service';
 import { ImagenPin } from '../models/imagen-pin';
+
+import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-detalle',
@@ -17,7 +19,9 @@ export class DetalleComponent implements OnInit {
   state:boolean = true;
   Urls : string[] = []; 
 
-  constructor(public rest:RestService, public el: ElementRef) {
+  @Input() queryText:string = '';
+
+  constructor(public rest:RestService, public el: ElementRef, private modalService: NgbModal) {
     console.log("Empesemos.");
   }
 
@@ -42,6 +46,12 @@ export class DetalleComponent implements OnInit {
     this.getBusqueda('cat');
   }
 
+public buscar(){
+  console.log('queremos buscar ' + this.queryText);
+  this.getBusqueda(this.queryText);
+}
+
+
   getBusqueda(query: string) {
     this.contenedor = [];
     this.rest.getGif(query).subscribe((data: {}) => {
@@ -51,6 +61,7 @@ export class DetalleComponent implements OnInit {
 
       this.contenedor.data.forEach(item => {
         let imagen = new ImagenPin();
+        imagen.id = item.id;
         imagen.titulo = item.title;
         imagen.url = item.images.fixed_width.url;
 
@@ -75,5 +86,26 @@ export class DetalleComponent implements OnInit {
     });
     
   }
+
+  closeResult: string;
+
+  open(content, id) {
+    this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
+      this.closeResult = `Closed with: ${result}, ${id}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  private getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+    } else {
+      return  `with: ${reason}`;
+    }
+  }
+
 
 }
