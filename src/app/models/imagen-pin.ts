@@ -1,5 +1,6 @@
 export class ImagenPin {
     id : string;
-    titulo: String;
-    url: String;
+    titulo: string;
+    url: string;
+    urlFull:string;
 }

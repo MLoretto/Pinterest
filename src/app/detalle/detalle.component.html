@@ -1,13 +1,12 @@
 <ng-template #content let-modal>
   <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">Profile update</h4>
+    <h4 class="modal-title" id="modal-basic-title">{{modalItem.titulo}}</h4>
     <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
   <div class="modal-body">
-    imagen.
-    <img >
+    <img src="{{modalItem.url}}">
   </div>
   <!--
   <div class="modal-footer">
@@ -16,14 +15,10 @@
   -->
 </ng-template>
 
-<button class="btn btn-lg btn-outline-primary" (click)="open(content)">Launch demo modal</button>
 
-<hr>
 
-<pre>{{closeResult}}</pre>
-
-<div class="card-columns" (scrolled)="onScroll()" >
-  <div *ngFor="let item of imagenes; let i = index" (click)="open(content, item.id)" >
+<div class="card-columns" >
+  <div *ngFor="let item of imagenes; let i = index" (click)="open(content, item)" >
     <div class="card">
       <img class="card-img-top" src="{{item.url}}" alt="Card image cap">
       <div class="card-body">

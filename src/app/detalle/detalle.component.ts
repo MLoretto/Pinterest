@@ -31,10 +31,6 @@ export class DetalleComponent implements OnInit {
     const scrollPosition = window.pageYOffset
     let scrollDiferencia = document.body.scrollHeight - scrollPosition;
 
-    console.log(componentPosition);
-    console.log(scrollPosition);
-    console.log(scrollDiferencia);
-
     if (scrollDiferencia <= 900 && this.state) {
       this.state = false;
       console.log("A cargar...!!!" + this.rest.pag);
@@ -83,7 +79,7 @@ public buscar(){
         let imagen = new ImagenPin();
         imagen.titulo = item.title;
         imagen.url = item.images.fixed_width.url;
-
+        imagen.urlFull = item.images.original.url;
         this.imagenes.push(imagen);
       });
       this.state = true;
@@ -92,10 +88,14 @@ public buscar(){
   }
 
   closeResult: string;
+  modalImage:string;
+  modalItem:any;
 
-  open(content, id) {
+  open(content, item) {
+    this.modalItem = item;
     this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
-      this.closeResult = `Closed with: ${result}, ${id}`;
+      
+      this.closeResult = `Closed with: ${result}, ${item.id}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
     });
